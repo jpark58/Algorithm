@@ -1,4 +1,5 @@
 '''
+This is Java Solution
 class Solution {
     public int[] findDiagonalOrder(List<List<Integer>> nums) {
         HashMap<Integer, List<Integer>> map = new HashMap<>();
