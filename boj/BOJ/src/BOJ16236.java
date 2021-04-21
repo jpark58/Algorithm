@@ -44,7 +44,7 @@ public class BOJ16236 {
 				if(map[i][j] == 9) {
 					map[i][j] = 0;
 					sharkX = i;
-					sharkY = i;
+					sharkY = j;
 				}
 			}
 		}
