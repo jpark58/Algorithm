@@ -1,32 +1,34 @@
 import java.util.*;
 import java.io.*;
 
+class House{
+	int x, y;
+	
+	House(int x, int y) {
+		this.x = x;
+		this.y = y;
+	}
+}
+
+class Chicken{
+	int x, y;
+	
+	Chicken(int x, int y) {
+		this.x = x;
+		this.y = y;
+	}
+}
+
 public class BOJ15686 {
 	static int N;
 	static int M;
 	static ArrayList<Chicken> chicken;
 	static ArrayList<House> house;
 	static int[][] map;
-	static int[][] copyMap;
 	static int min;
+	static boolean[] open;
 	
-	static class House{
-		public int x, y;
-		
-		public House(int x, int y) {
-			this.x = x;
-			this.y = y;
-		}
-	}
-	
-	static class Chicken{
-		public int x, y;
-		
-		public Chicken(int x, int y) {
-			this.x = x;
-			this.y = y;
-		}
-	}
+
 
 	public static void main(String[] args) throws IOException{
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
@@ -36,16 +38,14 @@ public class BOJ15686 {
 		M = Integer.parseInt(st.nextToken());
 		
 		min = Integer.MAX_VALUE;
-		map = new int[N+1][N+1];
-		copyMap = new int[N+1][N+1];
+		map = new int[N][N];
 		chicken = new ArrayList<Chicken>();
 		house = new ArrayList<House>();
 		
-		for(int i = 1; i <= N; i++) {
+		for(int i = 0; i < N; i++) {
 			st = new StringTokenizer(br.readLine());
-			for(int j = 1; j <= N; j++) {
+			for(int j = 0; j < N; j++) {
 				map[i][j] = Integer.parseInt(st.nextToken());
-				copyMap[i][j] = map[i][j];
 				if(map[i][j]== 2) {
 					chicken.add(new Chicken(i, j));
 				}
@@ -54,23 +54,24 @@ public class BOJ15686 {
 				}
 			}
 		}
+		open = new boolean[chicken.size()];
 		
-		dfs(0, 0, new ArrayList<Integer>());
+		dfs(0, 0);
 		System.out.println(min);
 	}
 	
-	public static void dfs(int idx, int depth, ArrayList<Integer> list) {
+	public static void dfs(int idx, int depth) {
 		if(depth == M) {
 			
 			int curr = 0;
 			
 			for(int i = 0; i < house.size(); i++) {
-				House currHouse = house.get(i);
 				int distance = Integer.MAX_VALUE;
 				
-				for(int e: list) {
-					Chicken currChicken = chicken.get(e); 
-					distance = Math.min(distance, Math.abs(currHouse.x - currChicken.x) + Math.abs(currHouse.y - currChicken.y));
+				for(int j= 0; j < chicken.size(); j++) {
+					if(open[j]) {
+						distance = Math.min(distance, Math.abs(house.get(i).x - chicken.get(j).x) + Math.abs(house.get(i).y - chicken.get(j).y));
+					}
 				}
 				
 				curr += distance;
@@ -82,11 +83,9 @@ public class BOJ15686 {
 		}
 		
 		for(int i = idx; i < chicken.size(); i++) {
-			if(!list.contains(i)) {
-				list.add(i);
-				dfs(idx+1, depth+1, list);
-				list.remove(list.size()-1);
-			}
+			open[i] = true;
+			dfs(i+1, depth+1);
+			open[i] = false;
 		}
 	}
 }
