@@ -66,7 +66,6 @@ public class BOJ17142 {
 	public static void comb(int start, int size, ArrayList<Integer> list) {
 		if(size == M) {
 			bfs(list, emptyCount);
-			System.out.println(list.toString());
 			return;
 		}
 		

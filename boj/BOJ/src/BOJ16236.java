@@ -1,76 +1,72 @@
 import java.io.*;
 import java.util.*;
 
-public class BOJ16236 {
+public class BOJ16236{
 	static int N;
 	static int[][] map;
-	static int feedCount;
-	static int sharkX;
-	static int sharkY;
-	static int sharkEat;
-	static int sharkSize;
-	static int minX;
-	static int minY;
-	static int minDistance;
-	static int[][] distance;
-	static int[] dx = {0, 1, 0, -1};
-	static int[] dy = {-1, 0, 1, 0};
+	static int sharkX, sharkY, sharkSize, sharkEat;
+	static int totalFish;
+	static int[] dx = {-1, 0, 1, 0};
+	static int[] dy = {0, 1, 0, -1};
 	static int time;
+	static int[][] dist;
+	static int minX, minY, minDist;
 	
-	private static class Point {
-		private int x;
-		private int y;
-		
-		private Point(int x, int y) {
+	static class Point{
+		int x, y;
+		public Point(int x, int y) {
 			this.x = x;
 			this.y = y;
 		}
 	}
-
-	public static void main(String[] args) throws IOException{
+	
+	
+	public static void main(String[] args) throws Exception{
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 		StringTokenizer st = new StringTokenizer(br.readLine());
+		
 		N = Integer.parseInt(st.nextToken());
-		
-		map = new int[N][N];
-		time = 0;
+		map = new int[N+1][N+1];
 		sharkEat = 0;
-		sharkSize = 2;
+		totalFish = 0;
+		time = 0;
 		
-		for(int i = 0; i < N; i++) {
+		for(int i = 1; i <= N; i++) {
 			st = new StringTokenizer(br.readLine());
-			for(int j = 0; j < N; j++) {
+			for(int j = 1; j <= N; j++) {
 				map[i][j] = Integer.parseInt(st.nextToken());
-				if(map[i][j] == 9) {
-					map[i][j] = 0;
+				if(map[i][j]== 9) {
 					sharkX = i;
 					sharkY = j;
+					sharkSize = 2;
+					map[i][j] = 0;
 				}
+				if(map[i][j]>=1 && map[i][j]<=6) totalFish++;
 			}
 		}
-
+		
 		while(true) {
-			distance = new int[N][N];
+			dist = new int[N+1][N+1];
 			minX = Integer.MAX_VALUE;
 			minY = Integer.MAX_VALUE;
-			minDistance = Integer.MAX_VALUE;
+			minDist = Integer.MAX_VALUE;
 			
 			bfs(sharkX, sharkY);
 			
 			if(minX != Integer.MAX_VALUE && minY != Integer.MAX_VALUE) {
-				sharkEat++;
 				map[minX][minY] = 0;
-				if(sharkEat == sharkSize) {
+				sharkX = minX;
+				sharkY = minY;
+				sharkEat++;
+				time += minDist;
+				
+				if(sharkSize == sharkEat) {
 					sharkSize++;
 					sharkEat = 0;
 				}
-				sharkX = minX;
-				sharkY = minY;
-				time += distance[minX][minY];
 			}else {
 				break;
 			}
-			
 		}
 		
 		System.out.println(time);
@@ -78,39 +74,40 @@ public class BOJ16236 {
 	}
 	
 	public static void bfs(int x, int y) {
-		Queue<Point> q = new LinkedList<Point>();
-		q.offer(new Point(x,y));
+		Queue<Point> q = new LinkedList<>();
+		q.add(new Point(x, y));
 		
 		while(!q.isEmpty()) {
 			Point curr = q.poll();
-			
 			for(int i = 0; i < 4; i++) {
 				int nx = curr.x + dx[i];
 				int ny = curr.y + dy[i];
 				
-				if(nx>=0 && nx<N && ny>=0 && ny < N) {
-					if(map[nx][ny] <= sharkSize && distance[nx][ny] == 0) {
-						distance[nx][ny] = distance[curr.x][curr.y]+1;
+				if(nx >= 1 && nx <= N && ny>=1 && ny <= N && map[nx][ny] <= sharkSize) {
+					if(dist[nx][ny]==0) {
+						dist[nx][ny] = dist[curr.x][curr.y] + 1;
 						
-						if(map[nx][ny] != 0 && map[nx][ny] < sharkSize) {
-							if(minDistance > distance[nx][ny]) {
-								minDistance = distance[nx][ny];
+						if(map[nx][ny] < sharkSize && map[nx][ny] > 0) {
+							if(minDist > dist[nx][ny]) {
+								minDist = dist[nx][ny];
 								minX = nx;
 								minY = ny;
 							}
-							else if(minDistance == distance[nx][ny]) {
+							else if(minDist == dist[nx][ny]) {
 								if(minX == nx) {
 									if(minY > ny) {
-										minX = nx;
 										minY = ny;
+										minX = nx;
 									}
-								}else if(minX > nx) {
+								}
+								else if(minX > nx) {
 									minX = nx;
 									minY = ny;
 								}
 							}
 						}
-						q.offer(new Point(nx, ny));
+						
+						q.offer(new Point(nx,ny));
 					}
 				}
 			}
