@@ -6,6 +6,8 @@ import java.util.StringTokenizer;
 
 public class BOJ12865 {
     static int N,K;
+    static int[] W, V;
+    static Integer[][] dp;
 
     public static void main(String[] args) throws Exception{
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
@@ -14,26 +16,39 @@ public class BOJ12865 {
         N = Integer.parseInt(st.nextToken());
         K = Integer.parseInt(st.nextToken());
 
-        int[] W = new int[N + 1];
-        int[] V = new int[N + 1];
-        int[][] dp = new int[N + 1][K + 1];
+        W = new int[N];
+        V = new int[N];
 
-        for(int i = 1; i <= N; i++){
-            st = new StringTokenizer(br.readLine());
+        dp = new Integer[N][K+1];
+
+        for (int i = 0; i < N; i++) {
+            st = new StringTokenizer(br.readLine(), " ");
             W[i] = Integer.parseInt(st.nextToken());
             V[i] = Integer.parseInt(st.nextToken());
         }
 
-        for(int i = 1; i <= N; i++){
-            for(int j = 1; j <= K; j++){
-                if(W[i] > K){
-                    dp[i][j] = dp[i-1][j];
-                }else{
-                    dp[i][j] = Math.max(dp[i - 1][j], dp[i - 1][j - W[i]] + V[i]);
-                }
-            }
+        System.out.println(knapsack(N - 1, K));
+
+    }
+
+    private static int knapsack(int i, int k){
+        if (i < 0) {
+            return 0;
         }
 
-        System.out.println(dp[N][K]);
+        // 탐색하지 않은 위치라면?
+        if (dp[i][k] == null) {
+
+            // 현재 물건(i)을 추가로 못담는 경우 (이전 i값 탐색)
+            if(W[i] > k) {
+                dp[i][k] = knapsack(i - 1, k);
+            }
+            // 현재 물건(i)을 담을 수 있는 경우
+            else {
+                // 이전 i값과 이전 i값에 대한 k-W[i]의 값 + 현재 가치(V[i])중 큰 값을 저장
+                dp[i][k] = Math.max(knapsack(i - 1, k), knapsack(i - 1, k - W[i]) + V[i]);
+            }
+        }
+        return dp[i][k];
     }
 }
